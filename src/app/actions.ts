@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
+import type { SaveState } from "@/lib/save-state";
 
 /** Tworzy nowy, pusty profil i przenosi do jego strony edycji. */
 export async function createProfile() {
@@ -15,7 +16,11 @@ function str(v: FormDataEntryValue | null): string {
 }
 
 /** Zapisuje dane profilu oraz całą listę leków (podmiana). */
-export async function saveProfile(editToken: string, formData: FormData) {
+export async function saveProfile(
+  editToken: string,
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
   const profile = await prisma.profile.findUnique({ where: { editToken } });
   if (!profile) redirect("/");
 
@@ -61,6 +66,8 @@ export async function saveProfile(editToken: string, formData: FormData) {
 
   revalidatePath(`/edit/${editToken}`);
   revalidatePath(`/k/${profile.viewToken}`);
+
+  return { status: "saved", at: Date.now() };
 }
 
 /** Trwale usuwa profil. */

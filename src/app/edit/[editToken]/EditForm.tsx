@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { initialSaveState, type SaveState } from "@/lib/save-state";
 
 type Med = { name: string; dose: string; doseUnit: string; frequency: string; notes: string };
 
 const DOSE_UNITS = ["mg", "µg", "g", "ml", "j.m.", "tabl.", "kropli", "dawka"];
 
 type Props = {
-  action: (formData: FormData) => void | Promise<void>;
+  action: (prev: SaveState, formData: FormData) => Promise<SaveState>;
   initial: {
     fullName: string;
     birthYear: string;
@@ -52,8 +53,26 @@ export default function EditForm({ action, initial }: Props) {
   const updateMed = (i: number, key: keyof Med, value: string) =>
     setMeds((prev) => prev.map((m, idx) => (idx === i ? { ...m, [key]: value } : m)));
 
+  const [state, formAction] = useActionState(action, initialSaveState);
+  const [toastVisible, setToastVisible] = useState(false);
+
+  useEffect(() => {
+    if (state.status !== "saved") return;
+    setToastVisible(true);
+    const t = setTimeout(() => setToastVisible(false), 4000);
+    return () => clearTimeout(t);
+  }, [state]);
+
   return (
-    <form action={action} className="space-y-8">
+    <form action={formAction} className="space-y-8">
+      {toastVisible && (
+        <div
+          role="status"
+          className="sticky top-3 z-10 flex items-center gap-2 rounded-lg border border-green-300 bg-green-50 px-4 py-2.5 text-sm font-medium text-green-800 shadow-sm"
+        >
+          <span aria-hidden>✓</span> Zmiany zostały zapisane.
+        </div>
+      )}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Dane osoby</h2>
         <div className="grid gap-4 sm:grid-cols-2">
