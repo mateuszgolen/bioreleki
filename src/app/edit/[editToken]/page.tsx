@@ -72,6 +72,7 @@ export default async function EditPage({ params }: PageProps<"/edit/[editToken]"
             medications: profile.medications.map((m) => ({
               name: m.name,
               dose: m.dose,
+              doseUnit: m.doseUnit,
               frequency: m.frequency,
               notes: m.notes,
             })),

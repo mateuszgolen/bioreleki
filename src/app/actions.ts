@@ -24,6 +24,7 @@ export async function saveProfile(editToken: string, formData: FormData) {
 
   const names = formData.getAll("medName").map(str);
   const doses = formData.getAll("medDose").map(str);
+  const doseUnits = formData.getAll("medDoseUnit").map(str);
   const freqs = formData.getAll("medFrequency").map(str);
   const mnotes = formData.getAll("medNotes").map(str);
 
@@ -31,6 +32,7 @@ export async function saveProfile(editToken: string, formData: FormData) {
     .map((name, i) => ({
       name,
       dose: doses[i] ?? "",
+      doseUnit: doseUnits[i] ?? "",
       frequency: freqs[i] ?? "",
       notes: mnotes[i] ?? "",
       position: i,

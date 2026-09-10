@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 
-type Med = { name: string; dose: string; frequency: string; notes: string };
+type Med = { name: string; dose: string; doseUnit: string; frequency: string; notes: string };
+
+const DOSE_UNITS = ["mg", "µg", "g", "ml", "j.m.", "tabl.", "kropli", "dawka"];
 
 type Props = {
   action: (formData: FormData) => void | Promise<void>;
@@ -20,8 +22,9 @@ type Props = {
   };
 };
 
-const field =
-  "w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900";
+const fieldBase =
+  "rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900";
+const field = `w-full ${fieldBase}`;
 const labelCls = "block text-sm font-medium text-neutral-700";
 
 const BLOOD_TYPES = ["A Rh+", "A Rh-", "B Rh+", "B Rh-", "AB Rh+", "AB Rh-", "0 Rh+", "0 Rh-"];
@@ -43,7 +46,7 @@ export default function EditForm({ action, initial }: Props) {
   const [meds, setMeds] = useState<Med[]>(
     initial.medications.length
       ? initial.medications
-      : [{ name: "", dose: "", frequency: "", notes: "" }],
+      : [{ name: "", dose: "", doseUnit: "", frequency: "", notes: "" }],
   );
 
   const updateMed = (i: number, key: keyof Med, value: string) =>
@@ -95,7 +98,7 @@ export default function EditForm({ action, initial }: Props) {
           <h2 className="text-lg font-semibold">Leki</h2>
           <button
             type="button"
-            onClick={() => setMeds((p) => [...p, { name: "", dose: "", frequency: "", notes: "" }])}
+            onClick={() => setMeds((p) => [...p, { name: "", dose: "", doseUnit: "", frequency: "", notes: "" }])}
             className="rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100"
           >
             + Dodaj lek
@@ -107,7 +110,15 @@ export default function EditForm({ action, initial }: Props) {
             <div key={i} className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <input name="medName" value={m.name} onChange={(e) => updateMed(i, "name", e.target.value)} placeholder="Nazwa leku" className={field} />
-                <input name="medDose" value={m.dose} onChange={(e) => updateMed(i, "dose", e.target.value)} placeholder="Dawka, np. 10 mg" className={field} />
+                <div className="flex gap-2">
+                  <input name="medDose" value={m.dose} onChange={(e) => updateMed(i, "dose", e.target.value)} inputMode="decimal" placeholder="Dawka, np. 10" className={`${fieldBase} min-w-0 flex-1`} />
+                  <select name="medDoseUnit" value={m.doseUnit} onChange={(e) => updateMed(i, "doseUnit", e.target.value)} className={`${fieldBase} w-24 shrink-0`}>
+                    <option value="">jednostka</option>
+                    {DOSE_UNITS.map((u) => (
+                      <option key={u} value={u}>{u}</option>
+                    ))}
+                  </select>
+                </div>
                 <input name="medFrequency" value={m.frequency} onChange={(e) => updateMed(i, "frequency", e.target.value)} placeholder="Częstotliwość, np. 2x dziennie" className={field} />
                 <input name="medNotes" value={m.notes} onChange={(e) => updateMed(i, "notes", e.target.value)} placeholder="Uwagi (opcjonalnie)" className={field} />
               </div>

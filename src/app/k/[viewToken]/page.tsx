@@ -66,7 +66,9 @@ export default async function EmergencyCard({
                       <li key={m.id} className="rounded-lg bg-neutral-50 px-3 py-2">
                         <p className="font-medium text-neutral-900">{m.name}</p>
                         <p className="text-sm text-neutral-600">
-                          {[m.dose, m.frequency].filter(Boolean).join(" · ")}
+                          {[[m.dose, m.doseUnit].filter(Boolean).join(" "), m.frequency]
+                            .filter(Boolean)
+                            .join(" · ")}
                           {m.notes ? ` — ${m.notes}` : ""}
                         </p>
                       </li>

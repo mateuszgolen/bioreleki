@@ -42,7 +42,8 @@ model Medication {
   profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   name      String  // nazwa leku
-  dose      String  @default("") // np. "10 mg"
+  dose      String  @default("") // ilość, np. "10", "1/2"
+  doseUnit  String  @default("") // jednostka, np. "mg", "ml", "µg"
   frequency String  @default("") // np. "2x dziennie"
   notes     String  @default("")
   position  Int     @default(0) // kolejność na liście
