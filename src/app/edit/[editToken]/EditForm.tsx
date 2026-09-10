@@ -24,6 +24,8 @@ const field =
   "w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900";
 const labelCls = "block text-sm font-medium text-neutral-700";
 
+const BLOOD_TYPES = ["A Rh+", "A Rh-", "B Rh+", "B Rh-", "AB Rh+", "AB Rh-", "0 Rh+", "0 Rh-"];
+
 function SaveButton() {
   const { pending } = useFormStatus();
   return (
@@ -62,7 +64,12 @@ export default function EditForm({ action, initial }: Props) {
           </div>
           <div className="space-y-1">
             <label className={labelCls} htmlFor="bloodType">Grupa krwi</label>
-            <input id="bloodType" name="bloodType" placeholder="np. A Rh+" defaultValue={initial.bloodType} className={field} />
+            <select id="bloodType" name="bloodType" defaultValue={initial.bloodType} className={field}>
+              <option value="">Nie podano</option>
+              {BLOOD_TYPES.map((bt) => (
+                <option key={bt} value={bt}>{bt}</option>
+              ))}
+            </select>
           </div>
         </div>
       </section>
