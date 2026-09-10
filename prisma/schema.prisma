@@ -1,0 +1,51 @@
+// Prisma schema — MVP "karta ratunkowa" (emergency medical card)
+// Baza: SQLite teraz. Aby przejść na Postgres, zmień `provider` na "postgresql"
+// i ustaw DATABASE_URL na connection string Postgresa (adapter w src/lib/db.ts).
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// Profil jednej osoby. Bez kont użytkownika w MVP:
+/// - `viewToken`  trafia do kodu QR (dostęp publiczny, tylko odczyt)
+/// - `editToken`  to sekretny link do edycji (użytkownik go zachowuje)
+model Profile {
+  id             String       @id @default(cuid())
+  viewToken      String       @unique @default(cuid())
+  editToken      String       @unique @default(cuid())
+
+  fullName       String
+  birthYear      Int?
+  bloodType      String?
+  conditions     String       @default("") // choroby przewlekłe, wolny tekst / po przecinku
+  allergies      String       @default("") // alergie / uczulenia
+  notes          String       @default("") // dodatkowe informacje dla ratownika
+
+  emergencyName  String       @default("")
+  emergencyPhone String       @default("")
+
+  medications    Medication[]
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Medication {
+  id        String  @id @default(cuid())
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  name      String  // nazwa leku
+  dose      String  @default("") // np. "10 mg"
+  frequency String  @default("") // np. "2x dziennie"
+  notes     String  @default("")
+  position  Int     @default(0) // kolejność na liście
+
+  @@index([profileId])
+}
